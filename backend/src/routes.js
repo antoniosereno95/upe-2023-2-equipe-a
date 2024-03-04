@@ -1,21 +1,24 @@
 const express = require("express");
-const Routes = express.Router(); // variável para chamada do Router
-const { PrismaClient } = require("@prisma/client");
-
+const Routes = express.Router(); //variavel para chamada do Router
+const {PrismaClient} = require("@prisma/client");
+const { response } = require("express");
 const prisma = new PrismaClient();
 
-// CRUD Questoes -> Rotas do CRUD para Questoes
-// C
 
-// R
-Routes.get("/listarTodasQuestoes", async (request, response) => {
-  try {
-    const listaTodasQestoes = await prisma.questao.findMany();
-    return response.status(200).json(listaTodasQestoes);
-  } catch (error) {
-    console.error("Erro ao listar questões:", error);
-    return response.status(500).json({ error: "Erro interno do servidor" });
-  }
+
+//CRUD Questoes -> Rotas do CRUD para Questoes
+//C
+Routes.post("/CriarQuestoes", async (request, response) => {
+  const { titulo, Alternativas,resposta  } = request.body;
+  //Questoes.push({ titulo });
+  const novaQuestao = await prisma.questao.create({
+    data: {
+      titulo: titulo,
+      Alternativas: Alternativas,
+      resposta: resposta
+    }
+  });
+  return response.status(201).json(novaQuestao);
 });
 
 // U
