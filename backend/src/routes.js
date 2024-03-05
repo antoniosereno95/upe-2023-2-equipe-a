@@ -1,10 +1,9 @@
+
 const express = require("express");
 const Routes = express.Router(); //variavel para chamada do Router
-const {PrismaClient} = require("@prisma/client");
+const { PrismaClient } = require("@prisma/client");
 const { response } = require("express");
 const prisma = new PrismaClient();
-
-
 
 //CRUD Questoes -> Rotas do CRUD para Questoes
 //C
@@ -20,6 +19,13 @@ Routes.post("/CriarQuestoes", async (request, response) => {
   });
   return response.status(201).json(novaQuestao);
 });
+
+Routes.get("/listarTodasQuestoes" , async (request, response) => {
+
+  const listaTodasQestoes = await prisma.questao.findMany();
+
+  return response.status(200).json(listaTodasQestoes);
+})
 
 // U
 Routes.put("/UpdateQuestao", async (request, response) => {
@@ -84,85 +90,49 @@ Routes.delete("/DeletarQuestao/:id", async (request, response) => {
   }
 });
 
-// CRUD Alternativas -> Rotas do CRUD para Alternativas
-// C
-Routes.post('/CriarAlternativa', async (req, res) => {
-  const { texto, letra } = req.body;
-
+//CRUD Alternativas -> Rotas do CRUD para Alternativas
+//C
+Routes.post("/CriarAlternativa", async (request, response) => {
+  const { texto, letra } = request.body;
+  
   try {
     const novaAlternativa = await prisma.alternativa.create({
       data: {
         texto: texto,
-        letra: letra, 
-      },
+        letra: letra
+      }
     });
-
-    res.status(201).json({
-      id: novaAlternativa.id,
-      texto: novaAlternativa.texto,
-      letra: novaAlternativa.letra,
-    });
+    return response.status(201).json(novaAlternativa);
   } catch (error) {
     console.error("Erro ao criar alternativa:", error);
-    res.status(500).json({ error: "Erro interno do servidor" });
-  }
-});
-
-// Listar todas as alternativas
-Routes.get('/listarTodasAlternativas', async (req, res) => {
-  try {
-    const listaTodasAlternativas = await prisma.alternativa.findMany();
-    return res.status(200).json(listaTodasAlternativas);
-  } catch (error) {
-    console.error("Erro ao listar alternativas:", error);
-    return res.status(500).json({ error: "Erro interno do servidor" });
-  }
-});
-
-
-// CRUD Usuario -> Rotas do CRUD para Usuario
-// C
-Routes.post("/CriarUsuario", async (request, response) => {
-  const { nome, email } = request.body;
-
-  try {
-    const novaUser = await prisma.user.create({
-      data: {
-        nome: nome,
-        email: email,
-      },
-    });
-    return response.status(201).json(novaUser);
-  } catch (error) {
-    console.error("Erro ao criar usuário:", error);
     return response.status(500).json({ error: "Erro interno do servidor" });
   }
 });
 
-// R
-Routes.get("/listarTodosUser", async (request, response) => {
+//R
+Routes.get("/listarTodasAlternativas", async (request, response) => {
   try {
-    const listaTodosUser = await prisma.user.findMany();
-    return response.status(200).json(listaTodosUser);
+    const todasAsAlternativas = await prisma.alternativa.findMany();
+    return response.status(200).json(todasAsAlternativas);
   } catch (error) {
-    console.error("Erro ao listar usuários:", error);
+    console.error("Erro ao listar todas as alternativas:", error);
     return response.status(500).json({ error: "Erro interno do servidor" });
   }
 });
 
-// CRUD Provas -> Rotas do CRUD para Provas
-// C
+
+//CRUD Prova  -> Rotas do CRUD para provas
+//C
 Routes.post("/CriarProva", async (request, response) => {
-  const { nome, questoes } = request.body;
-
+  const { titulo, data, disciplina } = request.body;
+  
   try {
     const novaProva = await prisma.prova.create({
       data: {
-        nome: nome,
-        questoes: {
-          connect: questoes.map((questaoId) => ({ id: questaoId })),
-        },
-      },
+        titulo: titulo,
+        data: data,
+        disciplina: disciplina
+      }
     });
     return response.status(201).json(novaProva);
   } catch (error) {
@@ -171,86 +141,15 @@ Routes.post("/CriarProva", async (request, response) => {
   }
 });
 
-// R
+ //R
 Routes.get("/listarTodasProvas", async (request, response) => {
   try {
-    const listaTodasProvas = await prisma.prova.findMany({
-      include: {
-        questoes: true,
-      },
-    });
-    return response.status(200).json(listaTodasProvas);
+    const todasAsProvas = await prisma.prova.findMany();
+    return response.status(200).json(todasAsProvas);
   } catch (error) {
-    console.error("Erro ao listar provas:", error);
+    console.error("Erro ao listar todas as provas:", error);
     return response.status(500).json({ error: "Erro interno do servidor" });
   }
 });
-
-// U
-// Routes.put("/UpdateProva", async (request, response) => {
-//   const { id, nome, questoes } = request.body;
-
-//   try {
-//     const intId = parseInt(id);
-
-//     if (!intId) {
-//       return response.status(400).json("Id é obrigatório");
-//     }
-
-//     const ProvaExiste = await prisma.prova.findUnique({
-//       where: { id: intId },
-//     });
-
-//     if (!ProvaExiste) {
-//       return response.status(404).json("Prova não existe");
-//     }
-
-//     const update = await prisma.prova.update({
-//       where: { id: intId },
-//       data: {
-//         nome: nome,
-//         questoes: {
-//           set: questoes.map((questaoId) => ({ id: questaoId })),
-//         },
-//       },
-//       include: {
-//         questoes: true,
-//       },
-//     });
-
-//     return response.status(200).json(update);
-//   } catch (error) {
-//     console.error("Erro ao atualizar prova:", error);
-//     return response.status(500).json({ error: "Erro interno do servidor" });
-//   }
-// });
-
-// // D
-// Routes.delete("/DeletarProva/:id", async (request, response) => {
-//   const { id } = request.params;
-
-//   try {
-//     const intId = parseInt(id);
-
-//     if (!intId) {
-//       return response.status(400).json("Id é obrigatório");
-//     }
-
-//     const ProvaExiste = await prisma.prova.findUnique({
-//       where: { id: intId },
-//     });
-
-//     if (!ProvaExiste) {
-//       return response.status(404).json("Prova não existe");
-//     }
-
-//     await prisma.prova.delete({ where: { id: intId } });
-
-//     return response.status(200).send();
-//   } catch (error) {
-//     console.error("Erro ao deletar prova:", error);
-//     return response.status(500).json({ error: "Erro interno do servidor" });
-//   }
-// });
 
 module.exports = Routes; // exportando as rotas

@@ -25,3 +25,10 @@ model Questao {
   Alternativas String
   resposta     String
 }
+
+model Prova {
+  id         Int    @id @default(autoincrement())
+  titulo     String @unique
+  data       String @unique
+  disciplina String
+}

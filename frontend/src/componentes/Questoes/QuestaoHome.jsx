@@ -1,4 +1,5 @@
-import QuestaoList from './QuestaoList'
+import { QuestaoList } from "./QuestaoList";
+
 
 function QuestaoHome() {
   return (

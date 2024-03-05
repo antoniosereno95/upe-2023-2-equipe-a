@@ -1,12 +1,14 @@
+import { AddAlternative } from "../../componentes/AddAlternative";
 import { Header } from "../../componentes/Header";
-import * as C from "./styles";
+import * as H from "./styles";
 
 export function Home() {
 
   return (
-    <C.Container>
+    <H.Container>
       <Header title={"Home"}/>
       <h1>Home</h1>
-    </C.Container>
+      <AddAlternative />
+    </H.Container>
   )
 }
