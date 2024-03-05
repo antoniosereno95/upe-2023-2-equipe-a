@@ -5,12 +5,26 @@ import * as H from "./styles";
 export const AddAlternative = ({ setListaAlternativas }) => {
     const [inputText, setInputText] = useState('');
     const [letra, setLetra] = useState('');
+    const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-    const handleAddAlternativa = async () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!inputText || !letra) {
+            console.error('Por favor, preencha todos os campos');
+            return;
+        }
+
         try {
-            const response = await axios.post('/CriarAlternativa', { texto: inputText, letra });
+            const response = await axios.post('http://localhost:3333/CriarAlternativa', { texto: inputText, letra });
             const novaAlternativa = response.data;
-            setListaAlternativas(prevAlternativas => [...prevAlternativas, novaAlternativa]);
+
+            if (typeof setListaAlternativas === 'function') {
+                setListaAlternativas(prevAlternativas => [...prevAlternativas, novaAlternativa]);
+            } else {
+                console.error('Erro: setListaAlternativas não é uma função');
+            }
+
             setInputText('');
             setLetra('');
         } catch (error) {
@@ -18,23 +32,33 @@ export const AddAlternative = ({ setListaAlternativas }) => {
         }
     };
 
+    const ControlaMostrarFormulario = () => {
+        setMostrarFormulario(!mostrarFormulario);
+    };
+
     return (
         <H.Container>
-            <H.Input
-                type="text"
-                placeholder="Letra da alternativa"
-                value={letra}
-                onChange={e => setLetra(e.target.value)}
-            />
-            <H.Input
-                type="text"
-                placeholder="Adicione uma alternativa"
-                value={inputText}
-                onChange={e => setInputText(e.target.value)}
-                onKeyUp={e => e.key === 'Enter' && handleAddAlternativa()}
-            />
-            <H.Button onClick={handleAddAlternativa}>Adicionar Alternativa</H.Button>
+            <button onClick={ControlaMostrarFormulario}>Criar Questão</button>
+            {mostrarFormulario && (
+                <form onSubmit={handleSubmit}>
+                    <h2>Criar Nova Alternativa</h2>
+                    <label>
+                        Alternativa:
+                        <H.Input>
+                            type="text" 
+                            value={inputText} 
+                            onChange={e => setInputText(e.target.value)}
+                        </H.Input> 
+                    </label>
+                    <br />
+                    <label>
+                        Letra:
+                        <input type="text" value={letra} onChange={e => setLetra(e.target.value)} />
+                    </label>
+                    <br />
+                    <button type="submit">Criar Alternativas</button>
+                </form>
+            )}
         </H.Container>
     );
 };
-

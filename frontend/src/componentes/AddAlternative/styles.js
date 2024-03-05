@@ -1,29 +1,31 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
+const Container = styled.div`
     border: 1px solid #555;
     border-radius: 15px;
     padding: 10px;
     margin: 20px 0;
-    display : flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
 `;
 
-export const Input = styled.input`
+const Input = styled.input`
     border: 0px;
     background: transparent;
     outline: 0;
     color: #000;
     font-size: 18px;
     flex: 1;
+    margin-bottom: 10px;
 
     &::placeholder {
         color: #ccc;
     }
 `;
 
-export const Button = styled.button`
-    margin-left: 10px;
+const Button = styled.button`
+    margin-top: 10px;
     background-color: #007bff;
     color: #fff;
     border: none;
